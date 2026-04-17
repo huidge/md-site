@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Usage Guide</title>
+<title>Readme</title>
 <style>/* ===== Reset & Base ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -187,6 +187,52 @@ body {
   background: var(--accent);
 }
 
+/* sidebar group */
+.sidebar-group { margin-bottom: 4px; }
+
+.sidebar-group-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.sidebar-group-label::before {
+  content: '▾';
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.sidebar-group.collapsed .sidebar-group-label::before {
+  transform: rotate(-90deg);
+}
+
+.sidebar-group-label:hover { background: rgba(0,0,0,0.04); }
+
+.sidebar-group-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-left: 8px;
+  overflow: hidden;
+  max-height: 2000px;
+  transition: max-height 0.3s ease;
+}
+
+.sidebar-group.collapsed .sidebar-group-items {
+  max-height: 0;
+}
+
 /* sidebar footer info */
 .sidebar-footer {
   padding: 12px 8px 0;
@@ -325,42 +371,90 @@ main {
 </style>
 </head>
 <body>
-<nav class="sidebar"><h2>Pages</h2><ul><li><a href="hello.html">Hello</a></li>
-<li><a href="guide.html" class="active">Usage Guide</a></li></ul></nav>
-<main class="md-content"><h1>Usage Guide</h1>
-<p>How to use md-site to document anything.</p>
-<h2>Adding Pages</h2>
-<ol>
-<li>Create a <code>.md</code> file in <code>content/</code></li>
-<li>Add an entry to <code>content/manifest.json</code>:</li>
-</ol>
-<pre><code class="language-json">[
-  { &quot;file&quot;: &quot;hello.md&quot;, &quot;title&quot;: &quot;Hello&quot; },
-  { &quot;file&quot;: &quot;my-page.md&quot;, &quot;title&quot;: &quot;My Page&quot; }
-]
+<nav class="sidebar"><h2>Pages</h2><ul><li class="sidebar-group"><span class="sidebar-group-label">Reports</span>
+<ul class="sidebar-group-items">
+<li><a href="README.html" class="active">Readme</a></li>
+</ul></li>
+<li class="sidebar-group"><span class="sidebar-group-label">Daily</span>
+<ul class="sidebar-group-items">
+<li><a href="daily/2026-04-15.html">2026-04-15</a></li>
+<li><a href="daily/2026-04-16.html">2026-04-16</a></li>
+<li><a href="daily/2026-04-17.html">2026-04-17</a></li>
+</ul></li>
+<li class="sidebar-group"><span class="sidebar-group-label">Us Stock / Daily</span>
+<ul class="sidebar-group-items">
+<li><a href="us-stock/daily/2026-04-15.html">2026-04-15</a></li>
+<li><a href="us-stock/daily/2026-04-16.html">2026-04-16</a></li>
+</ul></li>
+<li class="sidebar-group"><span class="sidebar-group-label">Weekly</span>
+<ul class="sidebar-group-items">
+<li><a href="weekly/2026-W16.html">2026-W16</a></li>
+</ul></li></ul></nav>
+<main class="md-content"><h1>Market Reports</h1>
+<p>每日股票市场汇总报告，由 AI 自动生成。</p>
+<h2>目录结构</h2>
+<pre><code>market-reports/
+├── daily/              # A股每日收盘汇总
+│   ├── 2026-04-15.md
+│   ├── 2026-04-16.md
+│   └── ...
+├── us-stock/
+│   └── daily/          # 美股每日收盘汇总
+│       ├── 2026-04-15.md
+│       ├── 2026-04-16.md
+│       └── ...
+└── weekly/             # A股每周行情周报
+    ├── 2026-W16.md
+    └── ...
 </code></pre>
-<ol>
-<li>Refresh the browser — your page appears in the sidebar.</li>
-</ol>
-<h2>Editing Content</h2>
-<p>Just edit the <code>.md</code> file with any text editor. Changes appear on refresh.</p>
-<h2>Deploying</h2>
-<p>This is a static site — deploy anywhere:</p>
+<h2>报告内容</h2>
+<p><strong>A股日报</strong> (<code>daily/YYYY-MM-DD.md</code>)
+- 主要指数收盘数据（上证、深证、创业板、科创50 等）
+- 板块涨跌排行与资金流向
+- 热点题材分析
+- 技术面与消息面综合研判</p>
+<p><strong>美股日报</strong> (<code>us-stock/daily/YYYY-MM-DD.md</code>)
+- 三大指数收盘（道琼斯、标普500、纳斯达克）
+- 板块轮动与个股亮点
+- 宏观消息面
+- 技术分析与后市展望</p>
+<p><strong>A股周报</strong> (<code>weekly/YYYY-Www.md</code>)
+- 本周主要指数表现汇总
+- 板块周度涨跌排行
+- 本周大事回顾
+- 下周展望</p>
+<h2>自动化</h2>
+<p>报告由 <a href="https://github.com/huidge/hermes-skills">Hermes Agent</a> 自动生成并同步：</p>
+<table>
+<thead>
+<tr>
+<th>报告</th>
+<th>生成时间</th>
+<th>同步方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A股日报</td>
+<td>工作日 15:30</td>
+<td>生成后自动 git push</td>
+</tr>
+<tr>
+<td>A股周报</td>
+<td>周五 17:00</td>
+<td>生成后自动 git push</td>
+</tr>
+<tr>
+<td>美股日报</td>
+<td>每天 06:00</td>
+<td>定时 06:30/16:30 同步</td>
+</tr>
+</tbody>
+</table>
+<h2>数据来源</h2>
 <ul>
-<li><strong>GitHub Pages</strong> — push to <code>gh-pages</code> branch</li>
-<li><strong>Netlify / Vercel</strong> — connect repo, set publish dir to <code>.</code> </li>
-<li><strong>Any web server</strong> — copy the files to your document root</li>
-</ul>
-<h2>Customization</h2>
-<h3>Styling</h3>
-<p>Edit <code>assets/style.css</code> to change colors, fonts, or layout. CSS variables at the top make it easy:</p>
-<pre><code class="language-css">:root {
-  --accent: #0969da;      /* links and highlights */
-  --bg-sidebar: #f6f8fa;  /* sidebar background */
-  --radius: 8px;          /* border radius */
-}
-</code></pre>
-<h3>Auto-discovery</h3>
-<p>If you skip <code>manifest.json</code>, the app tries to find files named <code>hello.md</code>, <code>index.md</code>, <code>readme.md</code>, <code>about.md</code>, and <code>guide.md</code> automatically.</p></main>
+<li>A股：东方财富、证券时报数据宝、新浪财经</li>
+<li>美股：Yahoo Finance、CNBC、Reuters</li>
+</ul></main>
 </body>
 </html>

@@ -1,4 +1,50 @@
 [
-  { "file": "hello.md", "title": "Hello" },
-  { "file": "guide.md", "title": "Usage Guide" }
+  {
+    "group": "Reports",
+    "pages": [
+      {
+        "file": "README.md",
+        "title": "Readme"
+      }
+    ]
+  },
+  {
+    "group": "Daily",
+    "pages": [
+      {
+        "file": "daily/2026-04-15.md",
+        "title": "2026-04-15"
+      },
+      {
+        "file": "daily/2026-04-16.md",
+        "title": "2026-04-16"
+      },
+      {
+        "file": "daily/2026-04-17.md",
+        "title": "2026-04-17"
+      }
+    ]
+  },
+  {
+    "group": "Us Stock / Daily",
+    "pages": [
+      {
+        "file": "us-stock/daily/2026-04-15.md",
+        "title": "2026-04-15"
+      },
+      {
+        "file": "us-stock/daily/2026-04-16.md",
+        "title": "2026-04-16"
+      }
+    ]
+  },
+  {
+    "group": "Weekly",
+    "pages": [
+      {
+        "file": "weekly/2026-W16.md",
+        "title": "2026-W16"
+      }
+    ]
+  }
 ]

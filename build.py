@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Optional static build — converts all .md files into standalone HTML pages.
-Use this for deployment where you want no client-side JS.
+Static build — converts all .md files into standalone HTML pages.
+Supports grouped manifest: [{group, pages: [{file, title}]}] or flat [{file, title}].
 
 Usage: python3 build.py
 Output: dist/
@@ -29,29 +29,64 @@ TEMPLATE = """\
 </body>
 </html>"""
 
-def build():
-    # load manifest
+
+def load_manifest():
     manifest_path = CONTENT / "manifest.json"
     if manifest_path.exists():
-        pages = json.loads(manifest_path.read_text())
-    else:
-        pages = [{"file": f.name, "title": f.stem.capitalize()}
-                 for f in sorted(CONTENT.glob("*.md"))]
+        data = json.loads(manifest_path.read_text())
+        # detect grouped format
+        if data and isinstance(data[0], dict) and "group" in data[0]:
+            return data
+        # flat format -> wrap
+        return [{"group": "Pages", "pages": data}]
+    # fallback: auto-discover
+    found = [{"file": f.name, "title": f.stem.capitalize()}
+             for f in sorted(CONTENT.glob("**/*.md")) if f.name not in ("hello.md", "guide.md")]
+    return [{"group": "Reports", "pages": found}] if found else []
 
+
+def flat_pages(groups):
+    result = []
+    for g in groups:
+        result.extend(g["pages"])
+    return result
+
+
+def build():
+    groups = load_manifest()
+    pages = flat_pages(groups)
+    if not pages:
+        print("No pages found.")
+        return
+
+    # clean dist
+    import shutil
+    if DIST.exists():
+        shutil.rmtree(DIST)
     DIST.mkdir(exist_ok=True)
 
-    # build nav HTML
+    # build nav HTML (grouped)
     def nav_html(active_file):
         items = []
-        for p in pages:
-            cls = ' class="active"' if p["file"] == active_file else ""
-            items.append(f'<li><a href="{p["file"].replace(".md",".html")}"{cls}>{p["title"]}</a></li>')
+        for g in groups:
+            items.append(f'<li class="sidebar-group"><span class="sidebar-group-label">{g["group"]}</span>')
+            items.append('<ul class="sidebar-group-items">')
+            for p in g["pages"]:
+                href = p["file"].replace(".md", ".html")
+                # handle subdirectory paths: daily/2026-04-15.md -> daily/2026-04-15.html
+                cls = ' class="active"' if p["file"] == active_file else ""
+                items.append(f'<li><a href="{href}"{cls}>{p["title"]}</a></li>')
+            items.append('</ul></li>')
         return "\n".join(items)
 
     md = markdown.Markdown(extensions=["tables", "fenced_code"])
 
     for p in pages:
-        md_src = (CONTENT / p["file"]).read_text()
+        src = CONTENT / p["file"]
+        if not src.exists():
+            print(f"  skip (not found): {p['file']}")
+            continue
+        md_src = src.read_text()
         body = md.convert(md_src)
         md.reset()
         html = TEMPLATE.format(
@@ -60,11 +95,13 @@ def build():
             nav=nav_html(p["file"]),
             body=body,
         )
-        out_file = DIST / p["file"].replace(".md", ".html")
-        out_file.write_text(html)
-        print(f"  built {out_file.relative_to(ROOT)}")
+        out = DIST / p["file"].replace(".md", ".html")
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(html)
+        print(f"  built {out.relative_to(ROOT)}")
 
     print(f"\nDone! {len(pages)} pages -> {DIST}/")
+
 
 if __name__ == "__main__":
     build()
