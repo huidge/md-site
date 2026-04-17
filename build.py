@@ -102,7 +102,62 @@ def build():
         out.write_text(html)
         print(f"  built {out.relative_to(ROOT)}")
 
-    print(f"\nDone! {len(pages)} pages -> {DIST}/")
+    # --- Build index.html (landing page) ---
+    INDEX_TEMPLATE = """\
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Reports</title>
+<style>{style}
+/* index-specific overrides */
+.index-container {{ max-width: 720px; margin: 0 auto; padding: 64px 32px; }}
+.index-header {{ text-align: center; margin-bottom: 48px; }}
+.index-header h1 {{ font-size: 2.2em; margin-bottom: 8px; }}
+.index-header p {{ color: var(--text-muted); font-size: 1.1em; }}
+.index-group {{ margin-bottom: 32px; }}
+.index-group h2 {{ font-size: 1.1em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; }}
+.index-group ul {{ list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }}
+.index-group li a {{ display: block; padding: 12px 16px; background: var(--bg-sidebar); border: 1px solid var(--border); border-radius: var(--radius); text-decoration: none; color: var(--text); font-size: 0.95em; transition: border-color 0.15s, box-shadow 0.15s; }}
+.index-group li a:hover {{ border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }}
+.index-footer {{ text-align: center; color: var(--text-muted); font-size: 0.85em; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); }}
+@media (max-width: 480px) {{ .index-container {{ padding: 32px 16px; }} .index-group ul {{ grid-template-columns: 1fr; }} }}
+</style>
+</head>
+<body>
+<div class="index-container">
+<div class="index-header">
+  <h1>Market Reports</h1>
+  <p>A-share, US stock, and weekly market analysis reports</p>
+</div>
+{groups}
+<div class="index-footer">Auto-synced from market-reports · Updated {date}</div>
+</div>
+</body>
+</html>"""
+
+    import datetime
+    today = datetime.date.today().isoformat()
+    group_html = []
+    for g in groups:
+        links = []
+        for p in g["pages"]:
+            href = BASE + '/' + p["file"].replace(".md", ".html")
+            links.append(f'<li><a href="{href}">{p["title"]}</a></li>')
+        group_html.append(
+            f'<div class="index-group"><h2>{g["group"]}</h2><ul>{"".join(links)}</ul></div>'
+        )
+
+    index_html = INDEX_TEMPLATE.format(
+        style=STYLE,
+        groups="\n".join(group_html),
+        date=today,
+    )
+    (DIST / "index.html").write_text(index_html)
+    print("  built docs/index.html")
+
+    print(f"\nDone! {len(pages)} pages + index -> {DIST}/")
 
 
 if __name__ == "__main__":
