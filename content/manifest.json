@@ -1,23 +1,5 @@
 [
   {
-    "group": "Getting Started",
-    "pages": [
-      {
-        "file": "hello.md",
-        "title": "Hello"
-      }
-    ]
-  },
-  {
-    "group": "Reports",
-    "pages": [
-      {
-        "file": "README.md",
-        "title": "Readme"
-      }
-    ]
-  },
-  {
     "group": "Daily",
     "pages": [
       {
