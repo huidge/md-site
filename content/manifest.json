@@ -1,5 +1,14 @@
 [
   {
+    "group": "Getting Started",
+    "pages": [
+      {
+        "file": "hello.md",
+        "title": "Hello"
+      }
+    ]
+  },
+  {
     "group": "Reports",
     "pages": [
       {

@@ -33,7 +33,7 @@ for root, dirs, files in sorted(os.walk(content_dir)):
         if not f.endswith('.md'):
             continue
         rel = os.path.relpath(os.path.join(root, f), content_dir).replace('\\', '/')
-        # skip demo pages
+        # skip demo pages — added manually below
         if rel in ('hello.md', 'guide.md'):
             continue
         # determine group label from path
@@ -48,8 +48,10 @@ for root, dirs, files in sorted(os.walk(content_dir)):
             title = title.replace('-', ' ').title()
         groups.setdefault(label, []).append({'file': rel, 'title': title})
 
-# build flat manifest with group headers
-manifest = []
+# build manifest with group headers
+manifest = [{'group': 'Getting Started', 'pages': [
+    {'file': 'hello.md', 'title': 'Hello'},
+]}]
 for label, items in groups.items():
     manifest.append({'group': label, 'pages': items})
 

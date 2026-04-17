@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Readme</title>
+<title>Hello</title>
 <style>/* ===== Reset & Base ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -373,11 +373,11 @@ main {
 <body>
 <nav class="sidebar"><h2>Pages</h2><ul><li class="sidebar-group"><span class="sidebar-group-label">Getting Started</span>
 <ul class="sidebar-group-items">
-<li><a href="hello.html">Hello</a></li>
+<li><a href="hello.html" class="active">Hello</a></li>
 </ul></li>
 <li class="sidebar-group"><span class="sidebar-group-label">Reports</span>
 <ul class="sidebar-group-items">
-<li><a href="README.html" class="active">Readme</a></li>
+<li><a href="README.html">Readme</a></li>
 </ul></li>
 <li class="sidebar-group"><span class="sidebar-group-label">Daily</span>
 <ul class="sidebar-group-items">
@@ -394,71 +394,28 @@ main {
 <ul class="sidebar-group-items">
 <li><a href="weekly/2026-W16.html">2026-W16</a></li>
 </ul></li></ul></nav>
-<main class="md-content"><h1>Market Reports</h1>
-<p>每日股票市场汇总报告，由 AI 自动生成。</p>
-<h2>目录结构</h2>
-<pre><code>market-reports/
-├── daily/              # A股每日收盘汇总
-│   ├── 2026-04-15.md
-│   ├── 2026-04-16.md
-│   └── ...
-├── us-stock/
-│   └── daily/          # 美股每日收盘汇总
-│       ├── 2026-04-15.md
-│       ├── 2026-04-16.md
-│       └── ...
-└── weekly/             # A股每周行情周报
-    ├── 2026-W16.md
-    └── ...
-</code></pre>
-<h2>报告内容</h2>
-<p><strong>A股日报</strong> (<code>daily/YYYY-MM-DD.md</code>)
-- 主要指数收盘数据（上证、深证、创业板、科创50 等）
-- 板块涨跌排行与资金流向
-- 热点题材分析
-- 技术面与消息面综合研判</p>
-<p><strong>美股日报</strong> (<code>us-stock/daily/YYYY-MM-DD.md</code>)
-- 三大指数收盘（道琼斯、标普500、纳斯达克）
-- 板块轮动与个股亮点
-- 宏观消息面
-- 技术分析与后市展望</p>
-<p><strong>A股周报</strong> (<code>weekly/YYYY-Www.md</code>)
-- 本周主要指数表现汇总
-- 板块周度涨跌排行
-- 本周大事回顾
-- 下周展望</p>
-<h2>自动化</h2>
-<p>报告由 <a href="https://github.com/huidge/hermes-skills">Hermes Agent</a> 自动生成并同步：</p>
-<table>
-<thead>
-<tr>
-<th>报告</th>
-<th>生成时间</th>
-<th>同步方式</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>A股日报</td>
-<td>工作日 15:30</td>
-<td>生成后自动 git push</td>
-</tr>
-<tr>
-<td>A股周报</td>
-<td>周五 17:00</td>
-<td>生成后自动 git push</td>
-</tr>
-<tr>
-<td>美股日报</td>
-<td>每天 06:00</td>
-<td>定时 06:30/16:30 同步</td>
-</tr>
-</tbody>
-</table>
-<h2>数据来源</h2>
+<main class="md-content"><h1>Welcome to md-site</h1>
+<p>A minimal static site for displaying Markdown content.</p>
+<h2>Features</h2>
 <ul>
-<li>A股：东方财富、证券时报数据宝、新浪财经</li>
-<li>美股：Yahoo Finance、CNBC、Reuters</li>
-</ul></main>
+<li><strong>Zero build step</strong> — just drop <code>.md</code> files into <code>content/</code></li>
+<li><strong>Collapsible sidebar</strong> — grouped navigation with animation</li>
+<li><strong>Clean typography</strong> — GitHub-flavored styling</li>
+<li><strong>Static build</strong> — generate pure HTML with <code>python3 build.py</code></li>
+</ul>
+<h2>Quick Start</h2>
+<pre><code class="language-bash"># serve locally
+cd ~/md-site
+python3 -m http.server 8080
+
+# or with Node
+npx serve .
+</code></pre>
+<h2>Sync Reports</h2>
+<pre><code class="language-bash"># auto-sync from market-reports, build, and push to GitHub
+bash sync-reports.sh
+</code></pre>
+<hr />
+<p>Made with simplicity in mind.</p></main>
 </body>
 </html>
