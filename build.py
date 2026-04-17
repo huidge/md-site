@@ -10,7 +10,7 @@ Output: dist/
 import json, os, pathlib, markdown
 
 ROOT = pathlib.Path(__file__).parent
-DIST = ROOT / "dist"
+DIST = ROOT / "docs"
 CONTENT = ROOT / "content"
 STYLE = (ROOT / "assets" / "style.css").read_text()
 
