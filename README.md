@@ -4,13 +4,18 @@ A minimal static site for displaying Markdown content with a collapsible sidebar
 
 > [中文文档](README_zh-CN.md)
 
+## Live Demo
+
+**https://huidge.github.io/md-site/**
+
 ## Features
 
 - Zero build step — drop `.md` files into `content/` and go
-- Collapsible sidebar with smooth animation (`Ctrl+B` to toggle, state persisted)
+- Collapsible sidebar with grouped navigation and smooth animation (`Ctrl+B` to toggle)
 - GitHub-flavored styling — code blocks, tables, blockquotes
 - Responsive layout — adapts to mobile and desktop
-- Optional static build — generate pure HTML without client-side JS
+- Auto sync — pull markdown from source directory, build, and push to GitHub in one command
+- GitHub Pages — auto-deployed from `docs/` directory
 
 ## Quick Start
 
@@ -18,55 +23,63 @@ A minimal static site for displaying Markdown content with a collapsible sidebar
 # local dev server
 cd md-site
 python3 -m http.server 8080
-
-# or with Node
-npx serve .
 ```
 
 Open http://localhost:8080
+
+## Auto Sync
+
+Sync markdown files from `market-reports/`, build static site, and push to GitHub:
+
+```bash
+bash sync-reports.sh
+```
+
+This will:
+1. Copy `.md` files from configured source directories into `content/`
+2. Generate grouped `manifest.json` for sidebar navigation
+3. Run `build.py` to generate static HTML into `docs/`
+4. Commit and push to GitHub (auto-deploys via GitHub Pages)
 
 ## Project Structure
 
 ```
 md-site/
-├── index.html              # entry point
-├── build.py                # optional static build script
+├── index.html              # dev entry point (client-side rendering)
+├── sync-reports.sh         # auto sync + build + deploy script
+├── build.py                # static HTML generator
+├── README.md               # English
+├── README_zh-CN.md         # 中文文档
 ├── assets/
-│   ├── style.css           # theme (CSS variables for easy customization)
-│   └── app.js              # markdown loader + sidebar logic
+│   ├── style.css           # theme (CSS variables for customization)
+│   └── app.js              # markdown loader + grouped sidebar
 ├── content/
-│   ├── manifest.json        # sidebar page list
-│   ├── hello.md             # demo page
-│   └── guide.md             # usage guide
-└── dist/                    # static build output (generated)
+│   ├── manifest.json        # sidebar config (auto-generated)
+│   └── {synced .md files}
+├── docs/                    # static build output (GitHub Pages source)
+└── content/
+    ├── daily/               # synced reports
+    ├── us-stock/daily/
+    └── weekly/
 ```
 
-## Adding Pages
+## Adding Pages Manually
 
 1. Create a `.md` file in `content/`
-2. Add an entry to `content/manifest.json`:
+2. Add it to `content/manifest.json`:
 
 ```json
 [
-  { "file": "hello.md", "title": "Hello" },
-  { "file": "my-page.md", "title": "My Page" }
+  {
+    "group": "My Section",
+    "pages": [
+      { "file": "my-page.md", "title": "My Page" }
+    ]
+  }
 ]
 ```
 
 3. Refresh — your page appears in the sidebar.
-
-If `manifest.json` is missing, the app auto-discovers common filenames (`hello.md`, `index.md`, `readme.md`, etc.).
-
-## Static Build
-
-Generate standalone HTML pages (no JS required at runtime):
-
-```bash
-pip install markdown
-python3 build.py
-```
-
-Output goes to `dist/` — deploy anywhere as static files.
 
 ## Customization
 
@@ -84,11 +97,9 @@ Edit CSS variables in `assets/style.css`:
 
 ## Deploy
 
-This is a static site — deploy to any static host:
+Auto-deployed via GitHub Pages from `docs/` on every push.
 
-- **GitHub Pages** — push to `gh-pages` or enable in repo settings
-- **Netlify / Vercel** — connect repo, set publish directory to `.`
-- **Any web server** — copy files to document root
+Manual deploy: copy `docs/` to any static host.
 
 ## License
 
