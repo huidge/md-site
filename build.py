@@ -65,15 +65,17 @@ def build():
         shutil.rmtree(DIST)
     DIST.mkdir(exist_ok=True)
 
-    # build nav HTML (grouped)
+    # GitHub Pages base path (change if deploying to custom domain)
+    BASE = '/md-site'
+
+    # build nav HTML (grouped) — use root-relative paths to avoid nesting issues
     def nav_html(active_file):
         items = []
         for g in groups:
             items.append(f'<li class="sidebar-group"><span class="sidebar-group-label">{g["group"]}</span>')
             items.append('<ul class="sidebar-group-items">')
             for p in g["pages"]:
-                href = p["file"].replace(".md", ".html")
-                # handle subdirectory paths: daily/2026-04-15.md -> daily/2026-04-15.html
+                href = BASE + '/' + p["file"].replace(".md", ".html")
                 cls = ' class="active"' if p["file"] == active_file else ""
                 items.append(f'<li><a href="{href}"{cls}>{p["title"]}</a></li>')
             items.append('</ul></li>')
