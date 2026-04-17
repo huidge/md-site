@@ -2,6 +2,8 @@
 
 A minimal static site for displaying Markdown content with a collapsible sidebar.
 
+> [中文文档](README_zh-CN.md)
+
 ## Features
 
 - Zero build step — drop `.md` files into `content/` and go
