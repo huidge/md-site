@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026-04-17</title>
+<style>/* ===== Reset & Base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #ffffff;
+  --bg-sidebar: #f8f9fb;
+  --text: #1f2328;
+  --text-muted: #656d76;
+  --border: #e1e4e8;
+  --accent: #0969da;
+  --accent-light: #ddf4ff;
+  --code-bg: #f6f8fa;
+  --radius: 8px;
+  --sidebar-width: 260px;
+  --sidebar-gap: 100px;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', Helvetica, Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.7;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: 24px 12px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.collapsed {
+  width: 0;
+  min-width: 0;
+  padding: 24px 0;
+  border-right: none;
+  overflow: hidden;
+}
+
+/* Sidebar header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.sidebar-header h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Toggle button */
+.sidebar-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 16px;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Floating toggle when sidebar collapsed */
+.sidebar-toggle-floating {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 100;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-toggle-floating:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.sidebar.collapsed ~ .sidebar-toggle-floating {
+  display: flex;
+}
+
+/* Nav list */
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* icon dot before each item */
+.sidebar-nav li a::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.sidebar-nav li a:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.sidebar-nav li a:hover::before {
+  background: var(--text-muted);
+}
+
+.sidebar-nav li a.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-nav li a.active::before {
+  background: var(--accent);
+}
+
+/* sidebar group */
+.sidebar-group { margin-bottom: 4px; }
+
+.sidebar-group-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.sidebar-group-label::before {
+  content: '▾';
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.sidebar-group.collapsed .sidebar-group-label::before {
+  transform: rotate(-90deg);
+}
+
+.sidebar-group-label:hover { background: rgba(0,0,0,0.04); }
+
+.sidebar-group-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-left: 8px;
+  overflow: hidden;
+  max-height: 2000px;
+  transition: max-height 0.3s ease;
+}
+
+.sidebar-group.collapsed .sidebar-group-items {
+  max-height: 0;
+}
+
+/* sidebar footer info */
+.sidebar-footer {
+  padding: 12px 8px 0;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ===== Main Content ===== */
+main {
+  flex: 1;
+  max-width: 820px;
+  padding: 48px 64px;
+  margin-left: var(--sidebar-gap);
+}
+
+/* ===== Markdown Rendered Content ===== */
+.md-content h1 { font-size: 2em; margin: 0 0 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.md-content h2 { font-size: 1.5em; margin: 40px 0 12px; }
+.md-content h3 { font-size: 1.25em; margin: 32px 0 8px; }
+.md-content h4 { font-size: 1.1em; margin: 24px 0 8px; }
+
+.md-content p { margin: 0 0 16px; }
+
+.md-content a { color: var(--accent); text-decoration: none; }
+.md-content a:hover { text-decoration: underline; }
+
+.md-content ul, .md-content ol { margin: 0 0 16px; padding-left: 24px; }
+.md-content li { margin-bottom: 4px; }
+
+.md-content blockquote {
+  margin: 0 0 16px;
+  padding: 8px 16px;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-light);
+  color: var(--text);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.md-content code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.md-content pre {
+  margin: 0 0 16px;
+  padding: 16px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.md-content pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.85em;
+  line-height: 1.6;
+}
+
+.md-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 16px;
+  font-size: 0.95em;
+}
+
+.md-content th, .md-content td {
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.md-content th {
+  background: var(--bg-sidebar);
+  font-weight: 600;
+}
+
+.md-content tr:hover td { background: var(--accent-light); }
+
+.md-content img {
+  max-width: 100%;
+  border-radius: var(--radius);
+}
+
+.md-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 32px 0;
+}
+
+/* ===== Loading / Error ===== */
+.loading, .error {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-muted);
+}
+
+.error { color: #cf222e; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  :root { --sidebar-gap: 0; }
+
+  body { flex-direction: column; }
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    max-height: 50vh;
+  }
+  .sidebar.collapsed {
+    width: 100%;
+    max-height: 48px;
+    padding: 12px 16px;
+    overflow: hidden;
+  }
+  .sidebar-nav ul {
+    flex-direction: row;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .sidebar-toggle-floating { display: none !important; }
+  .main { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+<nav class="sidebar"><h2>Pages</h2><ul><li class="sidebar-group"><span class="sidebar-group-label">Daily</span>
+<ul class="sidebar-group-items">
+<li><a href="/md-site/daily/2026-04-15.html">2026-04-15</a></li>
+<li><a href="/md-site/daily/2026-04-16.html">2026-04-16</a></li>
+<li><a href="/md-site/daily/2026-04-17.html">2026-04-17</a></li>
+<li><a href="/md-site/daily/2026-04-20.html">2026-04-20</a></li>
+<li><a href="/md-site/daily/2026-04-21.html">2026-04-21</a></li>
+<li><a href="/md-site/daily/2026-04-22.html">2026-04-22</a></li>
+</ul></li>
+<li class="sidebar-group"><span class="sidebar-group-label">Us Stock / Daily</span>
+<ul class="sidebar-group-items">
+<li><a href="/md-site/us-stock/daily/2026-04-15.html">2026-04-15</a></li>
+<li><a href="/md-site/us-stock/daily/2026-04-16.html">2026-04-16</a></li>
+<li><a href="/md-site/us-stock/daily/2026-04-17.html" class="active">2026-04-17</a></li>
+<li><a href="/md-site/us-stock/daily/2026-04-20.html">2026-04-20</a></li>
+<li><a href="/md-site/us-stock/daily/2026-04-21.html">2026-04-21</a></li>
+<li><a href="/md-site/us-stock/daily/2026-04-22.html">2026-04-22</a></li>
+</ul></li>
+<li class="sidebar-group"><span class="sidebar-group-label">Weekly</span>
+<ul class="sidebar-group-items">
+<li><a href="/md-site/weekly/2026-W16.html">2026-W16</a></li>
+</ul></li></ul></nav>
+<main class="md-content"><h1>美股每日行情汇总</h1>
+<h2>日期：2026年4月17日（周五，美东时间）</h2>
+<hr />
+<h2>一、主要指数收盘</h2>
+<table>
+<thead>
+<tr>
+<th>指数</th>
+<th>收盘价</th>
+<th>涨跌点数</th>
+<th>涨跌幅</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>道琼斯工业指数 (DJIA)</td>
+<td><strong>49,447.43</strong></td>
+<td>+868.71</td>
+<td><strong>+1.79%</strong></td>
+<td>盘中一度涨超1,100点</td>
+</tr>
+<tr>
+<td>标普500 (S&amp;P 500)</td>
+<td><strong>7,126.06</strong></td>
+<td>+84.78</td>
+<td><strong>+1.20%</strong></td>
+<td>🎉 <strong>历史新高</strong></td>
+</tr>
+<tr>
+<td>纳斯达克综合指数</td>
+<td><strong>24,468.48</strong></td>
+<td>+365.78</td>
+<td><strong>+1.52%</strong></td>
+<td>🎉 <strong>历史新高</strong></td>
+</tr>
+<tr>
+<td>罗素2000 (Russell 2000)</td>
+<td>2,776.90</td>
+<td>+57.30</td>
+<td>+2.10%</td>
+<td>小盘股反弹强劲</td>
+</tr>
+</tbody>
+</table>
+<h3>本周累计表现（年内最佳周表现）</h3>
+<table>
+<thead>
+<tr>
+<th>指数</th>
+<th>本周涨跌幅</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标普500</td>
+<td><strong>+4.5%</strong></td>
+<td>年内最佳单周表现</td>
+</tr>
+<tr>
+<td>道琼斯</td>
+<td>+3.2%</td>
+<td></td>
+</tr>
+<tr>
+<td>纳斯达克</td>
+<td>+6.8%</td>
+<td></td>
+</tr>
+<tr>
+<td>罗素2000</td>
+<td>+5.6%</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>市场特征：</strong> 🔥 <strong>标普500与纳指再度双双刷新收盘历史新高！</strong> 纳斯达克综合指数录得罕见的<strong>13连涨</strong>，创1992年以来最长连涨纪录。标普500实现12连阳。霍尔木兹海峡重新开放+美伊和平协议接近达成，推动油价暴跌、市场全线飙涨。</p>
+<hr />
+<h2>二、板块表现</h2>
+<h3>本周板块排行（S&amp;P 500 十一大板块）</h3>
+<table>
+<thead>
+<tr>
+<th>排名</th>
+<th>板块</th>
+<th>本周涨跌幅</th>
+<th>驱动因素</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>信息技术 (XLK)</td>
+<td><strong>+8.1%</strong></td>
+<td>AI芯片需求爆发、科技股连续领涨</td>
+</tr>
+<tr>
+<td>2</td>
+<td>可选消费 (XLY)</td>
+<td>+6.6%</td>
+<td>消费信心企稳、零售板块回暖</td>
+</tr>
+<tr>
+<td>3</td>
+<td>通信服务 (XLC)</td>
+<td>+6.3%</td>
+<td>AI应用概念持续走强</td>
+</tr>
+<tr>
+<td>4</td>
+<td>房地产 (XLRE)</td>
+<td>&gt;+3%</td>
+<td>利率预期改善推动</td>
+</tr>
+<tr>
+<td>5</td>
+<td>金融 (XLF)</td>
+<td>&gt;+3%</td>
+<td>银行财报季表现稳健</td>
+</tr>
+<tr>
+<td>6</td>
+<td>工业 (XLI)</td>
+<td>小幅上涨</td>
+<td>制造业产值反弹</td>
+</tr>
+<tr>
+<td>7</td>
+<td>医疗保健 (XLV)</td>
+<td>小幅上涨</td>
+<td></td>
+</tr>
+<tr>
+<td>—</td>
+<td><strong>能源 (XLE)</strong></td>
+<td><strong>-3.5%</strong></td>
+<td>⚠️ 油价暴跌拖累，领跌全场</td>
+</tr>
+<tr>
+<td>—</td>
+<td>公用事业 (XLU)</td>
+<td>-1.7%</td>
+<td>防御板块遭轮出</td>
+</tr>
+<tr>
+<td>—</td>
+<td>原材料 (XLB)</td>
+<td>小幅下跌</td>
+<td></td>
+</tr>
+<tr>
+<td>—</td>
+<td>必需消费 (XLP)</td>
+<td>小幅下跌</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>板块轮动特征：</strong> 资金大幅从能源/防御板块向科技/成长板块轮动。信息技术板块以8.1%的周涨幅遥遥领先，AI芯片、软件、半导体全面爆发。能源板块因霍尔木兹海峡重新开放导致油价暴跌而领跌。</p>
+<hr />
+<h2>三、个股亮点</h2>
+<h3>涨幅居前（S&amp;P 500 大盘股，当日）</h3>
+<ol>
+<li><strong>Sherwin-Williams (SHW)</strong>：<strong>+4.3%</strong>，道指成分股领涨</li>
+<li><strong>Home Depot (HD)</strong>：<strong>+3.66%</strong>，房地产回暖预期带动</li>
+<li><strong>3M (MMM)</strong>：<strong>+3.23%</strong>，工业板块反弹</li>
+<li><strong>AMD (AMD)</strong>：创历史新高，CPU需求爆发推动，分析师看好AI算力受益</li>
+<li><strong>阿里巴巴 (BABA)</strong>：<strong>+4.01%</strong>，中概股龙头领涨</li>
+</ol>
+<h3>跌幅居前</h3>
+<ol>
+<li><strong>Netflix (NFLX)</strong>：盘后<strong>重挫9%</strong> ⚠️</li>
+<li>上季营收大增但本季财测不及预期</li>
+<li>董事长兼联合创始人 Reed Hastings 宣布离开董事会</li>
+<li>29年创始时代终结，市场信心受挫</li>
+<li><strong>台积电 ADR (TSM)</strong>：<strong>-3.16%</strong>，财报亮眼但"利多不涨"，高预期压制</li>
+<li><strong>ASML</strong>：类似走势，AI芯片需求强劲但股价走弱</li>
+</ol>
+<h3>盘后异动</h3>
+<ul>
+<li><strong>Netflix (NFLX)</strong>：盘后暴跌9%，成为财报季最大负面意外</li>
+<li><strong>台积电 ADR</strong>：持续承压，市场对半导体"高预期"感到疲劳</li>
+</ul>
+<h3>中概股表现</h3>
+<ul>
+<li>热门中概股多数上涨，阿里巴巴涨4.01%领涨</li>
+<li>台积电 ADR 逆势下跌3.16%</li>
+</ul>
+<hr />
+<h2>四、大宗商品与外汇</h2>
+<table>
+<thead>
+<tr>
+<th>品种</th>
+<th>价格</th>
+<th>涨跌</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WTI原油</td>
+<td>~$81-82/桶</td>
+<td><strong>暴跌约14%</strong></td>
+<td>霍尔木兹海峡重新开放，油价跌回战前水平</td>
+</tr>
+<tr>
+<td>Brent原油</td>
+<td>~$86-87/桶</td>
+<td>大幅下跌</td>
+<td>海峡通航预期+美伊和谈进展</td>
+</tr>
+<tr>
+<td>黄金 (XAU/USD)</td>
+<td>~$4,900/盎司</td>
+<td><strong>+2.4%~3.6%</strong></td>
+<td>避险需求与地缘不确定性支撑</td>
+</tr>
+<tr>
+<td>美元指数 (DXY)</td>
+<td>微升</td>
+<td>结束八连跌</td>
+<td>评估美伊和谈前景</td>
+</tr>
+<tr>
+<td>美国10年期国债收益率</td>
+<td>4.26%</td>
+<td>持平</td>
+<td>和平预期压低避险需求</td>
+</tr>
+<tr>
+<td>VIX恐慌指数</td>
+<td><strong>17.48</strong></td>
+<td><strong>-2.6%</strong></td>
+<td>恐慌情绪大幅消退，逼近中性区间</td>
+</tr>
+</tbody>
+</table>
+<p><strong>大宗商品特征：</strong> 原油价格戏剧性暴跌，WTI跌回伊朗战争爆发前水平，因霍尔木兹海峡重新开放+美伊和平协议接近达成。黄金逆势上涨，受益于地缘不确定性（伊朗是否会履约）和美元走弱。VIX降至17.48，为近一个月低点。</p>
+<hr />
+<h2>五、重要消息面</h2>
+<h3>5.1 地缘政治 — 美伊局势（核心驱动力）🔥</h3>
+<ul>
+<li><strong>霍尔木兹海峡重新开放！</strong> 油价应声暴跌，市场迎来重大利好</li>
+<li><strong>特朗普重磅表态</strong>：美伊协议"可能很快达成"，伊朗已同意在逾20年内不发展核武</li>
+<li>停火是否延长？特朗普称"不一定"，但强调谈判进展"相当顺利"</li>
+<li><strong>以色列-黎巴嫩达成10天停火协议</strong>，特朗普称"以色列有机会与黎巴嫩达成和平协议"</li>
+<li>伊朗外交部对黎以停火表示欢迎，但伊朗总统称"美国多次违约，人民已完全失去信任"</li>
+<li>美国国防部长称"全面封死伊朗港口，成功迫14艘船紧急掉头"</li>
+<li><strong>关键风险</strong>：停火4月21日到期后能否延长，仍存不确定性</li>
+</ul>
+<h3>5.2 经济数据</h3>
+<ul>
+<li><strong>PPI（生产者价格指数）</strong>：环比+0.5%，同比+4%（2023年2月以来最高），能源为主要推动因素</li>
+<li><strong>初请失业金人数</strong>：20.7万人，减少1.1万人，就业市场依然稳健</li>
+<li><strong>NFIB小型企业信心指数</strong>：3月降至95.8，创11个月新低</li>
+<li><strong>亚特兰大联储GDPNow</strong>：Q1 GDP预测1.3%</li>
+<li>市场对美联储降息预期大幅升温：<strong>10月降息概率升至48.5%</strong>（此前10%），12月达66%</li>
+</ul>
+<h3>5.3 企业动态</h3>
+<ul>
+<li><strong>Netflix</strong>：Q1利润超预期但Q2指引疲软+创始人Hastings离开董事会，盘后暴跌9%</li>
+<li><strong>AMD</strong>：创历史新高，CPU需求爆发使其成为AI算力核心受益股</li>
+<li><strong>台积电 &amp; ASML</strong>：本周财报亮眼（AI芯片需求强劲），但股价"利多不涨"，高预期成为压力</li>
+<li><strong>英特尔</strong>：聘请三星资深高管韩升勋，力拓代工客户版图</li>
+<li><strong>马斯克</strong>：启动Terafab计划，打造AI芯片自主制造体系</li>
+<li><strong>波音</strong>：推出新型卫星平台，预计2026年交付26颗</li>
+<li><strong>OpenAI</strong>：全面升级Codex编程工具，AI编程竞争白热化</li>
+</ul>
+<h3>5.4 美联储与政策</h3>
+<ul>
+<li>纽约联储行长：不确定性阻碍提供利率指引，但料长期仍将降息</li>
+<li>特朗普能源主管召集石油巨头CEO会议，施压增产平抑油价</li>
+<li>美伊和平曙光推动交易员重新试水做空波动率</li>
+</ul>
+<hr />
+<h2>六、技术面与情绪分析</h2>
+<h3>6.1 标普500技术面</h3>
+<ul>
+<li>收于 <strong>7,126.06</strong>，连续第二日刷新历史收盘新高</li>
+<li>自3月30日低点以来累计反弹超<strong>12%</strong>，反弹速度惊人</li>
+<li>实现12连阳，为近年来罕见的强势表现</li>
+<li><strong>均线多头排列完好</strong>，5日/10日/20日均线提供强劲支撑</li>
+<li><strong>技术信号：强势突破确认，但连续上涨后短期有均值回归风险</strong></li>
+</ul>
+<h3>6.2 市场情绪</h3>
+<ul>
+<li><strong>VIX 17.48</strong>：恐慌指数大幅回落，逼近中性偏低区间（15以下为极度乐观）</li>
+<li>纳指13连涨（创1992年以来最长纪录），市场情绪极度亢奋</li>
+<li>交易员重新做空波动率，押注市场继续平静</li>
+<li><strong>风险警示</strong>：嘉信理财、摩根士丹利均警告市场可能"涨得过猛、过快"，短期回调风险上升</li>
+</ul>
+<h3>6.3 资金流向</h3>
+<ul>
+<li>资金从能源/防御板块向科技/AI成长板块大幅轮动</li>
+<li>36只S&amp;P 500成分股创52周新高，市场广度改善</li>
+<li>新兴市场债券表现强劲，利差收窄</li>
+</ul>
+<hr />
+<h2>七、对亚太市场影响</h2>
+<h3>7.1 正面传导</h3>
+<ul>
+<li>美股标普500+纳指双双创历史新高，纳指13连涨，全球风险偏好高涨</li>
+<li>科技股（AI芯片、软件、半导体）全线走强，利好港股/A股科技板块次日开盘</li>
+<li>油价暴跌缓解通胀担忧，降低能源成本压力</li>
+<li>中概股阿里巴巴涨4%，港股科技权重股强势</li>
+<li>美联储降息预期升温（10月概率48.5%），利好新兴市场</li>
+</ul>
+<h3>7.2 需关注风险</h3>
+<ul>
+<li>⚠️ <strong>美股连续暴涨后短期超买</strong>：标普500自低点反弹12%，纳指13连涨均处极端水平，历史经验表明回调概率上升</li>
+<li><strong>霍尔木兹海峡通航顺畅度存疑</strong>：实际航运恢复正常水平仍需时间，国际能源署预计至少两年</li>
+<li><strong>Netflix盘后暴跌9%</strong>：可能引发科技股财报季恐慌情绪</li>
+<li><strong>台积电/ASML"利多不涨"</strong>：半导体高预期压力下，任何不及预期都可能触发抛售</li>
+<li><strong>美伊停火4月21日到期</strong>：若未能延长，地缘风险可能卷土重来</li>
+<li>PPI同比+4%创3年新高，通胀上行风险未完全消除</li>
+</ul>
+<h3>7.3 次日A股/港股展望（4月21日周一）</h3>
+<ul>
+<li>港股科技板块大概率高开：阿里巴巴+4%，美股纳指创新高提振</li>
+<li>A股科技/AI板块受美股带动，半导体、软件、消费电子有望走强</li>
+<li><strong>能源板块承压</strong>：油价暴跌拖累石油、化工板块</li>
+<li>黄金股走势需关注：金价逆势上涨$4,900，但美元止跌可能形成压力</li>
+<li><strong>关键观察</strong>：4月21日美伊停火到期日，市场可能提前反应不确定性</li>
+</ul>
+<hr />
+<h2>八、下周关注要点</h2>
+<ol>
+<li><strong>美伊停火4月21日到期</strong>：能否延长是市场最大不确定性</li>
+<li><strong>财报季进入高潮</strong>：特斯拉、英伟达、微软等科技巨头将陆续公布Q1财报</li>
+<li><strong>Fed主席继任者Kevin Warsh确认听证</strong>（预计4月21日）</li>
+<li><strong>经济数据</strong>：5月1日PMI制造业数据、5月12日CPI数据</li>
+<li><strong>油价走势</strong>：霍尔木兹海峡通航恢复速度决定油价中枢</li>
+</ol>
+<hr />
+<h2>九、免责声明</h2>
+<p>本报告仅为市场数据汇总与个人分析，不构成任何投资建议。投资有风险，入市需谨慎。数据来源：CNBC、Barron's、TheStreet、Yahoo Finance、新浪财经、Investopedia、WSJ 等公开信息。</p>
+<hr />
+<p><em>报告生成时间：2026年4月21日 06:00 (北京时间)</em>
+<em>报告生成工具：Hermes Agent - 美股分析模块</em></p></main>
+</body>
+</html>
